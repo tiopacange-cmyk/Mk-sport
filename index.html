@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MK Sport – Catalogue</title>
+<meta name="description" content="Catalogue MK Sport : maillots club, pays, vintage, ensembles, survêtements et accessoires.">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161a22;
+    --text: #f2f4f8;
+    --muted: #9aa3b2;
+    --line: #262c38;
+    --accent: #e3262f;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+  header {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(13, 15, 20, .92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar {
+    max-width: 1200px; margin: 0 auto; padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .logo { font-weight: 900; font-size: 22px; letter-spacing: 1px; }
+  .logo span { color: var(--accent); }
+  .wa {
+    background: #25d366; color: #06290f; text-decoration: none;
+    font-weight: 700; font-size: 14px; padding: 8px 14px; border-radius: 999px;
+  }
+  nav {
+    max-width: 1200px; margin: 0 auto; padding: 0 16px 12px;
+    display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  nav button {
+    flex: none; cursor: pointer;
+    background: var(--surface); color: var(--muted);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 7px 14px; font-size: 13px; font-weight: 600;
+  }
+  nav button.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+  main { max-width: 1200px; margin: 0 auto; padding: 8px 16px 48px; }
+  section { margin-top: 32px; }
+  .kicker { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; }
+  h2 { margin: 4px 0 2px; font-size: 26px; font-weight: 900; }
+  .sub { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
+  .badge {
+    display: inline-block; margin-left: 8px; vertical-align: middle;
+    font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px;
+    background: #2a2f3a; color: var(--muted);
+  }
+  .grid {
+    display: grid; gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+  .card {
+    position: relative; aspect-ratio: 3 / 4; overflow: hidden;
+    border-radius: 10px; background: var(--surface); cursor: zoom-in;
+    border: 1px solid var(--line); padding: 0;
+  }
+  .card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .card .ph {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: rgba(255, 255, 255, .85); font-weight: 800; font-size: 14px; text-align: center; padding: 8px;
+  }
+  .card .num {
+    position: absolute; left: 6px; bottom: 6px;
+    background: rgba(0, 0, 0, .6); color: #fff; font-size: 11px; font-weight: 700;
+    padding: 2px 6px; border-radius: 4px;
+  }
+  .lb {
+    position: fixed; inset: 0; z-index: 50; display: none;
+    background: rgba(0, 0, 0, .92); align-items: center; justify-content: center; flex-direction: column;
+  }
+  .lb.open { display: flex; }
+  .lb img { max-width: 94vw; max-height: 78vh; border-radius: 8px; }
+  .lb .cap { margin-top: 12px; font-weight: 700; text-align: center; padding: 0 16px; }
+  .lb .actions { margin-top: 12px; display: flex; gap: 10px; }
+  .lb button, .lb a {
+    background: var(--surface); color: var(--text); border: 1px solid var(--line);
+    padding: 8px 14px; border-radius: 999px; font-size: 14px; cursor: pointer; text-decoration: none;
+  }
+  .lb .close { position: absolute; top: 12px; right: 12px; }
+  footer { text-align: center; color: var(--muted); font-size: 12px; padding: 24px 16px 40px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="logo">MK <span>SPORT</span></div>
+    <a class="wa" id="wa" href="#" target="_blank" rel="noopener" hidden>Commander sur WhatsApp</a>
+  </div>
+  <nav id="nav"></nav>
+</header>
+
+<main id="main"></main>
+
+<div class="lb" id="lb">
+  <button class="close" id="lbClose" aria-label="Fermer">✕</button>
+  <img id="lbImg" alt="">
+  <div class="cap" id="lbCap"></div>
+  <div class="actions">
+    <button id="lbPrev">‹ Préc.</button>
+    <a id="lbWa" target="_blank" rel="noopener" hidden>Commander</a>
+    <button id="lbNext">Suiv. ›</button>
+  </div>
+</div>
+
+<footer>© MK Sport — Catalogue</footer>
+
+<script>
+  // Numéro WhatsApp au format international, sans "+" ni espaces (ex : "2250700000000").
+  // Laisser vide pour masquer les boutons de commande.
+  const WHATSAPP = "";
+  const DOSSIER_IMAGES = "produits/";
+
+  const main = document.getElementById("main");
+  const nav = document.getElementById("nav");
+  let categories = [];
+  let current = [];   // liste des images visibles, pour la navigation du lightbox
+  let index = 0;
+
+  const waLink = (texte) => "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(texte);
+
+  if (WHATSAPP) {
+    const wa = document.getElementById("wa");
+    wa.href = waLink("Bonjour MK Sport, je souhaite passer une commande.");
+    wa.hidden = false;
+  }
+
+  fetch("catalogue.json")
+    .then((r) => r.json())
+    .then((data) => {
+      categories = data;
+      buildNav();
+      render("tout");
+    })
+    .catch(() => { main.textContent = "Impossible de charger le catalogue."; });
+
+  function buildNav() {
+    const filtres = [
+      ["tout", "Tout"],
+      ["nouveau", "Nouvelle saison"],
+      ["ancien", "Ancienne saison"],
+      ...categories.map((c) => [c.id, c.ancien && c.kicker === "ANCIENNE SAISON" ? c.titre + " (anc.)" : c.titre]),
+    ];
+    for (const [id, label] of filtres) {
+      const b = document.createElement("button");
+      b.textContent = label;
+      b.dataset.id = id;
+      b.onclick = () => render(id);
+      nav.appendChild(b);
+    }
+  }
+
+  function render(filtre) {
+    nav.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.id === filtre));
+    main.innerHTML = "";
+    current = [];
+    const liste = categories.filter((c) =>
+      filtre === "tout" ? true :
+      filtre === "nouveau" ? !c.ancien :
+      filtre === "ancien" ? c.ancien :
+      c.id === filtre);
+
+    for (const c of liste) {
+      const couleur = "#" + c.couleur;
+      const sec = document.createElement("section");
+      sec.innerHTML =
+        '<div class="kicker" style="color:' + couleur + '">' + c.kicker + "</div>" +
+        "<h2>" + c.titre + (c.ancien ? '<span class="badge">ANCIENNE SAISON</span>' : "") + "</h2>" +
+        '<div class="sub">' + c.etiquette + " · " + c.produits.length + " modèles</div>";
+      const grid = document.createElement("div");
+      grid.className = "grid";
+
+      c.produits.forEach((fichier, i) => {
+        const item = { src: DOSSIER_IMAGES + fichier, cap: c.etiquette + " — Modèle " + (i + 1), ref: fichier.replace(/\.\w+$/, "") };
+        const pos = current.push(item) - 1;
+        const card = document.createElement("button");
+        card.className = "card";
+        card.style.background = "linear-gradient(160deg," + couleur + "," + couleur + "55)";
+        card.innerHTML = '<div class="ph">' + c.etiquette + "</div>";
+        const img = new Image();
+        img.loading = "lazy";
+        img.alt = item.cap;
+        img.onload = () => card.querySelector(".ph")?.remove();
+        img.onerror = () => img.remove();
+        img.src = item.src;
+        card.prepend(img);
+        const num = document.createElement("span");
+        num.className = "num";
+        num.textContent = "#" + (i + 1);
+        card.appendChild(num);
+        card.onclick = () => open(pos);
+        grid.appendChild(card);
+      });
+
+      sec.appendChild(grid);
+      main.appendChild(sec);
+    }
+    window.scrollTo({ top: 0 });
+  }
+
+  const lb = document.getElementById("lb");
+  const lbImg = document.getElementById("lbImg");
+  const lbCap = document.getElementById("lbCap");
+  const lbWa = document.getElementById("lbWa");
+
+  function open(i) {
+    index = (i + current.length) % current.length;
+    const it = current[index];
+    lbImg.src = it.src;
+    lbImg.alt = it.cap;
+    lbCap.textContent = it.cap + " (réf. " + it.ref + ")";
+    if (WHATSAPP) {
+      lbWa.href = waLink("Bonjour MK Sport, je suis intéressé(e) par : " + it.cap + " (réf. " + it.ref + ").");
+      lbWa.hidden = false;
+    }
+    lb.classList.add("open");
+  }
+  const close = () => lb.classList.remove("open");
+
+  document.getElementById("lbClose").onclick = close;
+  document.getElementById("lbPrev").onclick = () => open(index - 1);
+  document.getElementById("lbNext").onclick = () => open(index + 1);
+  lb.onclick = (e) => { if (e.target === lb) close(); };
+  document.addEventListener("keydown", (e) => {
+    if (!lb.classList.contains("open")) return;
+    if (e.key === "Escape") close();
+    if (e.key === "ArrowLeft") open(index - 1);
+    if (e.key === "ArrowRight") open(index + 1);
+  });
+</script>
+</body>
+</html>
